@@ -69,9 +69,11 @@ class MainActivity : AppCompatActivity() {
         return glbFileNames
     }
 
-    fun navigate(view: Int) {
+    fun navigate(position: Int) {
+        System.out.println("jbdhchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhjcygyygygygdc");
+        System.out.println(position);
         val intent = Intent(this, Display::class.java)
-        intent.putExtra("position",view)
+        intent.putExtra("position",position.toString())
         startActivity(intent)
     }
 

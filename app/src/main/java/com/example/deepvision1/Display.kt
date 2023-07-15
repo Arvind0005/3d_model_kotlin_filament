@@ -1,4 +1,5 @@
 package com.example.deepvision1
+import android.content.Context
 import com.google.android.filament.utils.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,23 +14,32 @@ import kotlinx.coroutines.Dispatchers
 import java.nio.ByteBuffer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class Display : AppCompatActivity()  {
     private lateinit var surfaceView: SurfaceView
     private lateinit var choreographer: Choreographer
     private lateinit var modelViewer: ModelViewer
+
     private val images = arrayOf(R.drawable.wallpaper, R.drawable.image2, R.drawable.image3)
     companion object {
         init { Utils.init() }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         val paramValue = intent.getStringExtra("position")
-        System.out.println(paramValue.toString());
-        var namei ="Bee"
-        if(paramValue?.toIntOrNull()==0)
-            namei="DamagedHelmet"
-        else
-            namei="Bee"
+        System.out.println(("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"));
+
+        val glbFileNames = getAllGLBFileNames(this)
+        val intValue = paramValue?.toIntOrNull()
+        var namei =  if (intValue != null) glbFileNames[intValue] else null
+        if (namei != null) {
+            namei=namei.substring(0, namei.length - 4)
+        }
+        System.out.println(namei);
+//        if(paramValue?.toIntOrNull()==0)
+//            namei="Horse"
+//        else
+//            namei="Bee"
         super.onCreate(savedInstanceState)
         surfaceView = SurfaceView(this).apply{
             setContentView(this)
@@ -40,12 +50,33 @@ class Display : AppCompatActivity()  {
         surfaceView.setOnTouchListener(modelViewer)
 
         //display
-        loadGltf(namei)
+        loadGltf(namei.toString())
         modelViewer.scene.skybox = Skybox.Builder().build(modelViewer.engine)
         loadEnvironment("venetian_crossroads_2k")
 
 
     }
+    fun getAllGLBFileNames(context: Context): List<String> {
+        val assetManager = context.assets
+        val glbFileNames = mutableListOf<String>()
+
+        try {
+            val fileList = assetManager.list("models") // Assuming "models" is the directory name
+
+            if (fileList != null) {
+                for (file in fileList) {
+                    if (file.endsWith(".glb")) {
+                        glbFileNames.add(file)
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return glbFileNames
+    }
+
     private val frameCallback = object : Choreographer.FrameCallback {
         // private val startTime = System.nanoTime()
         private var currentAnimationIndex = 0
